@@ -37,7 +37,7 @@ pub(crate) fn get_dna_set(char: &u8) -> ParsimonySet {
             b'K' => ParsimonySet::from_iter(
                 nucleotides.into_iter().filter(|c| *c == b'G' || *c == b'T'),
             ),
-            _ => ParsimonySet::from_iter(nucleotides.into_iter()),
+            _ => ParsimonySet::from_iter(nucleotides),
         }
     }
 }
@@ -49,10 +49,10 @@ pub(crate) fn get_protein_set(char: &u8) -> ParsimonySet {
     } else {
         match *char {
             b'-' => gap_set(),
-            b'B' => ParsimonySet::from_iter([b'D', b'N'].into_iter()),
-            b'Z' => ParsimonySet::from_iter([b'E', b'Q'].into_iter()),
-            b'J' => ParsimonySet::from_iter([b'I', b'L'].into_iter()),
-            _ => ParsimonySet::from_iter(aminoacids.into_iter()),
+            b'B' => ParsimonySet::from_iter([b'D', b'N']),
+            b'Z' => ParsimonySet::from_iter([b'E', b'Q']),
+            b'J' => ParsimonySet::from_iter([b'I', b'L']),
+            _ => ParsimonySet::from_iter(aminoacids),
         }
     }
 }
@@ -74,7 +74,7 @@ pub(crate) fn get_parsimony_sets(
 }
 
 pub(crate) fn gap_set() -> ParsimonySet {
-    ParsimonySet::from_iter([b'-'].into_iter())
+    ParsimonySet::from_iter([b'-'])
 }
 
 #[cfg(test)]

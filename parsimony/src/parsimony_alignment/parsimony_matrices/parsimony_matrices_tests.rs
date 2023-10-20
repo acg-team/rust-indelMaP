@@ -1,3 +1,4 @@
+use crate::assert_float_relative_slice_eq;
 use crate::parsimony_alignment::parsimony_costs::{
     parsimony_costs_model::DNAParsCosts, parsimony_costs_simple::ParsimonyCostsSimple,
     ParsimonyCosts,
@@ -12,7 +13,6 @@ use crate::parsimony_alignment::parsimony_matrices::{
 };
 use approx::assert_relative_eq;
 use std::f64::INFINITY as INF;
-use crate::assert_float_relative_slice_eq;
 
 macro_rules! align {
     (@collect -) => { None };
@@ -34,9 +34,9 @@ fn fill_matrix() {
 
     pars_mats.fill_matrices(
         &node_info_1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &node_info_2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
 
     assert_eq!(
@@ -102,9 +102,9 @@ fn fill_matrix_other_outcome() {
     let mut pars_mats = PAM::new(3, 3, |l| l - 1);
     pars_mats.fill_matrices(
         &node_info_1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &node_info_2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
 
     assert_eq!(
@@ -169,31 +169,31 @@ fn traceback_correct() {
     let mut pars_mats = PAM::new(3, 3, |l| l - 1);
     pars_mats.fill_matrices(
         &node_info_1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &node_info_2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
 
     let (node_info, alignment, score) = pars_mats.traceback(&node_info_1, &node_info_2);
     assert_eq!(node_info[0], PSI::new([b'C', b'A'], NoGap));
     assert_eq!(node_info[1], PSI::new([b'C'], NoGap));
-    assert_eq!(alignment.map_x(), align!(0 1));
-    assert_eq!(alignment.map_y(), align!(0 1));
+    assert_eq!(alignment.map_x, align!(0 1));
+    assert_eq!(alignment.map_y, align!(0 1));
     assert_eq!(score, 1.0);
 
     let mut pars_mats = PAM::new(3, 3, |_| 0);
     pars_mats.fill_matrices(
         &node_info_1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &node_info_2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
 
     let (node_info, alignment, score) = pars_mats.traceback(&node_info_1, &node_info_2);
     assert_eq!(node_info[0], PSI::new([b'C', b'A'], NoGap));
     assert_eq!(node_info[1], PSI::new([b'C'], NoGap));
-    assert_eq!(alignment.map_x(), align!(0 1));
-    assert_eq!(alignment.map_y(), align!(0 1));
+    assert_eq!(alignment.map_x, align!(0 1));
+    assert_eq!(alignment.map_y, align!(0 1));
     assert_eq!(score, 1.0);
 }
 
@@ -215,9 +215,9 @@ fn setup_gap_adjustment_1() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(5, 3, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -300,8 +300,8 @@ fn traceback_gap_adjustment_1() {
         PSI::new([b'-'], GapFixed),
     ];
     assert_eq!(node_info, true_info);
-    assert_eq!(alignment.map_x(), align!(0 1 2 3));
-    assert_eq!(alignment.map_y(), align!(0 1 - -));
+    assert_eq!(alignment.map_x, align!(0 1 2 3));
+    assert_eq!(alignment.map_y, align!(0 1 - -));
     assert_eq!(score + 8.0, 8.0);
 }
 
@@ -326,9 +326,9 @@ fn setup_gap_adjustment_2() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(4, 4, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -404,8 +404,8 @@ fn traceback_gap_adjustment_2() {
         PSI::new([b'G'], NoGap),
     ];
     assert_eq!(node_info, true_info);
-    assert_eq!(alignment.map_x(), align!(0 1 2));
-    assert_eq!(alignment.map_y(), align!(0 1 2));
+    assert_eq!(alignment.map_x, align!(0 1 2));
+    assert_eq!(alignment.map_y, align!(0 1 2));
     assert_eq!(score + 12.0, 12.0);
 }
 
@@ -429,9 +429,9 @@ fn setup_gap_adjustment_3() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(7, 3, |l| l - 1);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -529,8 +529,8 @@ fn traceback_gap_adjustment_3() {
     ];
     assert_eq!(node_info.len(), true_info.len());
     assert_eq!(node_info, true_info);
-    assert_eq!(alignment.map_x(), align!(0 1 2 3 - 4 5));
-    assert_eq!(alignment.map_y(), align!(- - - 0 1 - -));
+    assert_eq!(alignment.map_x, align!(0 1 2 3 - 4 5));
+    assert_eq!(alignment.map_y, align!(- - - 0 1 - -));
     assert_eq!(score + 2.75, 4.25);
 }
 
@@ -555,9 +555,9 @@ fn setup_gap_adjustment_4() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(7, 3, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -655,8 +655,8 @@ fn traceback_gap_adjustment_4() {
     ];
     assert_eq!(node_info.len(), true_info.len());
     assert_eq!(node_info, true_info);
-    assert_eq!(alignment.map_x(), align!(- 0 1 2 3 4 5));
-    assert_eq!(alignment.map_y(), align!(0 - 1 - - - -));
+    assert_eq!(alignment.map_x, align!(- 0 1 2 3 4 5));
+    assert_eq!(alignment.map_y, align!(0 - 1 - - - -));
     assert_eq!(score + 2.75, 4.25);
 }
 
@@ -689,9 +689,9 @@ fn setup_different_branch_lengths() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(5, 3, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(2.0),
+        scoring.get_branch_costs(2.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -768,8 +768,8 @@ fn traceback_diff_branch_models() {
     ];
     assert_eq!(node_info.len(), true_info.len());
     assert_eq!(node_info, true_info);
-    assert_eq!(alignment.map_x(), align!(0 1 2 3));
-    assert_eq!(alignment.map_y(), align!(0 1 - -));
+    assert_eq!(alignment.map_x, align!(0 1 2 3));
+    assert_eq!(alignment.map_y, align!(0 1 - -));
     assert_relative_eq!(score, 9.0070875, epsilon = 0.0001);
 }
 
@@ -806,9 +806,9 @@ fn setup_different_branch_lengths_2() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(6, 4, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(3.0),
+        scoring.get_branch_costs(3.0),
         &right_info,
-        &scoring.get_branch_costs(3.5),
+        scoring.get_branch_costs(3.5),
     );
     (left_info, right_info, pars_mats)
 }
@@ -893,8 +893,8 @@ fn traceback_diff_branch_models_2() {
     ];
     assert_eq!(node_info.len(), true_info.len());
     assert_eq!(node_info, true_info);
-    assert_eq!(alignment.map_x(), align!(0 1 2 3 4 -));
-    assert_eq!(alignment.map_y(), align!(- - - 0 1 2));
+    assert_eq!(alignment.map_x, align!(0 1 2 3 4 -));
+    assert_eq!(alignment.map_y, align!(- - - 0 1 2));
     assert_relative_eq!(score + 7.921925 + 11.028825, 24.29755, epsilon = 0.0001);
 }
 
@@ -929,9 +929,9 @@ fn setup_different_branch_lengths_3() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(7, 3, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(0.6),
+        scoring.get_branch_costs(0.6),
         &right_info,
-        &scoring.get_branch_costs(2.6),
+        scoring.get_branch_costs(2.6),
     );
     (left_info, right_info, pars_mats)
 }
@@ -940,7 +940,7 @@ fn setup_different_branch_lengths_3() -> (Vec<PSI>, Vec<PSI>, PAM) {
 fn assert_float_relative_matrix_eq(actual: &[Vec<f64>], expected: &[Vec<f64>], epsilon: f64) {
     assert_eq!(actual.len(), expected.len());
     for (actual_row, expected_row) in actual.iter().zip(expected.iter()) {
-        assert_float_relative_slice_eq(&actual_row, &expected_row, epsilon);
+        assert_float_relative_slice_eq(actual_row, expected_row, epsilon);
     }
 }
 
@@ -1029,7 +1029,7 @@ fn traceback_diff_branch_models_3() {
     ];
     assert_eq!(node_info.len(), true_info.len());
     assert_eq!(node_info, true_info);
-    assert_eq!(alignment.map_x(), align!(0 1 2 3 4 5));
-    assert_eq!(alignment.map_y(), align!(- - - - 0 1));
+    assert_eq!(alignment.map_x, align!(0 1 2 3 4 5));
+    assert_eq!(alignment.map_y, align!(- - - - 0 1));
     assert_relative_eq!(score + 7.686975 + 8.619275, 20.16745, epsilon = 0.0001);
 }

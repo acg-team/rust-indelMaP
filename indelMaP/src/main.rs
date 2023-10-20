@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use crate::cli::Cli;
 use anyhow::Error;
 use clap::Parser;
@@ -36,7 +37,7 @@ fn indel_map_align_dna(
         false,
         false,
     )?;
-    Ok(pars_align_on_tree(&Box::new(&scoring), info))
+    Ok(pars_align_on_tree(&scoring, info))
 }
 
 fn indel_map_align_protein(
@@ -55,7 +56,7 @@ fn indel_map_align_protein(
         false,
         false,
     )?;
-    Ok(pars_align_on_tree(&Box::new(&scoring), info))
+    Ok(pars_align_on_tree(&scoring, info))
 }
 
 fn main() -> Result<()> {

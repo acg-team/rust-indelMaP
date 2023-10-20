@@ -1,5 +1,5 @@
 pub trait ParsimonyCosts {
-    fn get_branch_costs(&self, branch_length: f64) -> Box<&dyn BranchParsimonyCosts>;
+    fn get_branch_costs(&self, branch_length: f64) -> &dyn BranchParsimonyCosts;
 }
 
 pub trait BranchParsimonyCosts {
@@ -9,5 +9,5 @@ pub trait BranchParsimonyCosts {
     fn avg_cost(&self) -> f64;
 }
 
-pub mod parsimony_costs_simple;
 pub mod parsimony_costs_model;
+pub mod parsimony_costs_simple;

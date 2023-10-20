@@ -38,16 +38,16 @@ pub(crate) fn align_two_first_outcome() {
         .collect();
     let (_info, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |l| l - 1,
     );
     assert_eq!(score, 3.5);
-    assert_eq!(alignment.map_x().len(), 4);
-    assert_eq!(alignment.map_y().len(), 4);
-    assert_eq!(alignment.map_x(), align!(0 1 2 3));
-    assert_eq!(alignment.map_y(), align!(0 1 - -));
+    assert_eq!(alignment.map_x.len(), 4);
+    assert_eq!(alignment.map_y.len(), 4);
+    assert_eq!(alignment.map_x, align!(0 1 2 3));
+    assert_eq!(alignment.map_y, align!(0 1 - -));
 }
 
 #[test]
@@ -70,16 +70,16 @@ pub(crate) fn align_two_second_outcome() {
         .collect();
     let (_info, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |_| 0,
     );
     assert_eq!(score, 3.5);
-    assert_eq!(alignment.map_x().len(), 4);
-    assert_eq!(alignment.map_y().len(), 4);
-    assert_eq!(alignment.map_x(), align!(0 1 2 3));
-    assert_eq!(alignment.map_y(), align!(0 - -1));
+    assert_eq!(alignment.map_x.len(), 4);
+    assert_eq!(alignment.map_y.len(), 4);
+    assert_eq!(alignment.map_x, align!(0 1 2 3));
+    assert_eq!(alignment.map_y, align!(0 - -1));
 }
 
 #[test]
@@ -92,18 +92,19 @@ pub(crate) fn align_two_on_tree() {
         Record::with_attrs("A", None, b"AACT"),
         Record::with_attrs("A", None, b"AC"),
     ];
-    let mut tree = Tree::new(2, 0);
+    let mut tree = Tree::new(&sequences.to_vec());
     tree.add_parent(0, L(0), L(1), 1.0, 1.0);
+    tree.complete = true;
     tree.create_postorder();
     let info = PhyloInfo::new(tree, sequences.to_vec());
 
     let scoring = ParsimonyCostsSimple::new(mismatch_cost, gap_open_cost, gap_ext_cost);
 
-    let (alignment_vec, score) = pars_align_on_tree(&Box::new(&scoring), &info);
+    let (alignment_vec, score) = pars_align_on_tree(&scoring, &info);
     assert_eq!(score[Into::<usize>::into(info.tree.root)], 3.5);
     let alignment = &alignment_vec[Into::<usize>::into(info.tree.root)];
-    assert_eq!(alignment.map_x().len(), 4);
-    assert_eq!(alignment.map_y().len(), 4);
+    assert_eq!(alignment.map_x.len(), 4);
+    assert_eq!(alignment.map_y.len(), 4);
 }
 
 #[test]
@@ -125,14 +126,14 @@ pub(crate) fn internal_alignment_first_outcome() {
 
     let (_, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |_| 0,
     );
     assert_eq!(score, 1.0);
-    assert_eq!(alignment.map_x(), align!(0 1 2 3));
-    assert_eq!(alignment.map_y(), align!(0 1 - -));
+    assert_eq!(alignment.map_x, align!(0 1 2 3));
+    assert_eq!(alignment.map_y, align!(0 1 - -));
 }
 
 #[allow(dead_code)]
@@ -161,14 +162,14 @@ pub(crate) fn internal_alignment_second_outcome() {
 
     let (_info, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |_| 0,
     );
     assert_eq!(score, 2.0);
-    assert_eq!(alignment.map_x(), align!(0 1 2 3));
-    assert_eq!(alignment.map_y(), align!(0 - -1));
+    assert_eq!(alignment.map_x, align!(0 1 2 3));
+    assert_eq!(alignment.map_y, align!(0 - -1));
 }
 
 #[test]
@@ -190,14 +191,14 @@ pub(crate) fn internal_alignment_third_outcome() {
 
     let (_info, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |l| l - 1,
     );
     assert_eq!(score, 2.0);
-    assert_eq!(alignment.map_x(), align!(- 0 1 2 3));
-    assert_eq!(alignment.map_y(), align!(0 1 - - -));
+    assert_eq!(alignment.map_x, align!(- 0 1 2 3));
+    assert_eq!(alignment.map_y, align!(0 1 - - -));
 }
 
 #[test]
@@ -213,28 +214,29 @@ pub(crate) fn align_four_on_tree() {
         Record::with_attrs("D", None, b"GA"),
     ];
 
-    let mut tree = Tree::new(4, 2);
+    let mut tree = Tree::new(&sequences.to_vec());
     tree.add_parent(0, L(0), L(1), 1.0, 1.0);
     tree.add_parent(1, L(2), L(3), 1.0, 1.0);
     tree.add_parent(2, I(0), I(1), 1.0, 1.0);
+    tree.complete = true;
     tree.create_postorder();
 
     let info = PhyloInfo::new(tree, sequences.to_vec());
 
     let scoring = ParsimonyCostsSimple::new(c, a, b);
 
-    let (alignment_vec, score) = pars_align_on_tree(&Box::new(&scoring), &info);
+    let (alignment_vec, score) = pars_align_on_tree(&scoring, &info);
     // first cherry
     assert_eq!(score[0], 3.5);
-    assert_eq!(alignment_vec[0].map_x().len(), 4);
+    assert_eq!(alignment_vec[0].map_x.len(), 4);
     // second cherry
     assert_eq!(score[1], 2.0);
-    assert_eq!(alignment_vec[1].map_x().len(), 2);
+    assert_eq!(alignment_vec[1].map_x.len(), 2);
     // root, three possible alignments
     assert!(score[2] == 1.0 || score[2] == 2.0);
     if score[2] == 1.0 {
-        assert_eq!(alignment_vec[2].map_x().len(), 4);
+        assert_eq!(alignment_vec[2].map_x.len(), 4);
     } else {
-        assert!(alignment_vec[2].map_x().len() == 4 || alignment_vec[2].map_x().len() == 5);
+        assert!(alignment_vec[2].map_x.len() == 4 || alignment_vec[2].map_x.len() == 5);
     }
 }

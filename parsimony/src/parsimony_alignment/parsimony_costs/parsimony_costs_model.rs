@@ -108,7 +108,7 @@ fn generate_costs<const N: usize>(
 where
     Const<N>: DimMin<Const<N>, Output = Const<N>>,
 {
-    let costs = model
+    model
         .generate_scorings(times, zero_diag, rounded)
         .into_iter()
         .map(|(key, (branch_costs, avg_cost))| {
@@ -123,8 +123,7 @@ where
                 },
             )
         })
-        .collect();
-    costs
+        .collect()
 }
 
 fn sort_times(times: &[f64]) -> Vec<f64> {
@@ -148,8 +147,8 @@ impl<const N: usize> ParsimonyCostsWModel<N> {
 }
 
 impl<const N: usize> ParsimonyCosts for ParsimonyCostsWModel<N> {
-    fn get_branch_costs(&self, branch_length: f64) -> Box<&dyn BranchParsimonyCosts> {
-        Box::new(&self.costs[&f64_h::from(self.find_closest_branch_length(branch_length))])
+    fn get_branch_costs(&self, branch_length: f64) -> &dyn BranchParsimonyCosts {
+        &self.costs[&f64_h::from(self.find_closest_branch_length(branch_length))]
     }
 }
 
