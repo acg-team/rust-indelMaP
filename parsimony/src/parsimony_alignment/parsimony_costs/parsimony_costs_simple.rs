@@ -14,7 +14,7 @@ impl ParsimonyCostsSimple {
     pub(crate) fn new(mismatch: f64, gap_open: f64, gap_ext: f64) -> ParsimonyCostsSimple {
         ParsimonyCostsSimple {
             costs: BranchParsimonyCostsSimple {
-                mismatch: mismatch,
+                mismatch,
                 gap_open: gap_open * mismatch,
                 gap_ext: gap_ext * mismatch,
             },

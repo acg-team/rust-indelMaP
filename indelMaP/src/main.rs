@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use crate::cli::Cli;
 use anyhow::Error;
 use clap::Parser;

@@ -108,7 +108,7 @@ fn generate_costs<const N: usize>(
 where
     Const<N>: DimMin<Const<N>, Output = Const<N>>,
 {
-    let costs = model
+    model
         .generate_scorings(times, zero_diag, rounded)
         .into_iter()
         .map(|(key, (branch_costs, avg_cost))| {
@@ -123,8 +123,7 @@ where
                 },
             )
         })
-        .collect();
-    costs
+        .collect()
 }
 
 fn sort_times(times: &[f64]) -> Vec<f64> {
