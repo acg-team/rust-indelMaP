@@ -34,9 +34,9 @@ fn fill_matrix() {
 
     pars_mats.fill_matrices(
         &node_info_1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &node_info_2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
 
     assert_eq!(
@@ -102,9 +102,9 @@ fn fill_matrix_other_outcome() {
     let mut pars_mats = PAM::new(3, 3, |l| l - 1);
     pars_mats.fill_matrices(
         &node_info_1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &node_info_2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
 
     assert_eq!(
@@ -169,9 +169,9 @@ fn traceback_correct() {
     let mut pars_mats = PAM::new(3, 3, |l| l - 1);
     pars_mats.fill_matrices(
         &node_info_1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &node_info_2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
 
     let (node_info, alignment, score) = pars_mats.traceback(&node_info_1, &node_info_2);
@@ -184,9 +184,9 @@ fn traceback_correct() {
     let mut pars_mats = PAM::new(3, 3, |_| 0);
     pars_mats.fill_matrices(
         &node_info_1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &node_info_2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
 
     let (node_info, alignment, score) = pars_mats.traceback(&node_info_1, &node_info_2);
@@ -215,9 +215,9 @@ fn setup_gap_adjustment_1() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(5, 3, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -326,9 +326,9 @@ fn setup_gap_adjustment_2() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(4, 4, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -429,9 +429,9 @@ fn setup_gap_adjustment_3() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(7, 3, |l| l - 1);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -555,9 +555,9 @@ fn setup_gap_adjustment_4() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(7, 3, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -689,9 +689,9 @@ fn setup_different_branch_lengths() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(5, 3, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &right_info,
-        &scoring.get_branch_costs(2.0),
+        scoring.get_branch_costs(2.0),
     );
     (left_info, right_info, pars_mats)
 }
@@ -806,9 +806,9 @@ fn setup_different_branch_lengths_2() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(6, 4, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(3.0),
+        scoring.get_branch_costs(3.0),
         &right_info,
-        &scoring.get_branch_costs(3.5),
+        scoring.get_branch_costs(3.5),
     );
     (left_info, right_info, pars_mats)
 }
@@ -929,9 +929,9 @@ fn setup_different_branch_lengths_3() -> (Vec<PSI>, Vec<PSI>, PAM) {
     let mut pars_mats = PAM::new(7, 3, |_| 0);
     pars_mats.fill_matrices(
         &left_info,
-        &scoring.get_branch_costs(0.6),
+        scoring.get_branch_costs(0.6),
         &right_info,
-        &scoring.get_branch_costs(2.6),
+        scoring.get_branch_costs(2.6),
     );
     (left_info, right_info, pars_mats)
 }
@@ -940,7 +940,7 @@ fn setup_different_branch_lengths_3() -> (Vec<PSI>, Vec<PSI>, PAM) {
 fn assert_float_relative_matrix_eq(actual: &[Vec<f64>], expected: &[Vec<f64>], epsilon: f64) {
     assert_eq!(actual.len(), expected.len());
     for (actual_row, expected_row) in actual.iter().zip(expected.iter()) {
-        assert_float_relative_slice_eq(&actual_row, &expected_row, epsilon);
+        assert_float_relative_slice_eq(actual_row, expected_row, epsilon);
     }
 }
 

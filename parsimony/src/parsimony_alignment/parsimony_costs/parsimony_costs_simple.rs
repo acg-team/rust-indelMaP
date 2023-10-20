@@ -23,8 +23,8 @@ impl ParsimonyCostsSimple {
 }
 
 impl ParsimonyCosts for ParsimonyCostsSimple {
-    fn get_branch_costs(&self, _: f64) -> Box<&dyn BranchParsimonyCosts> {
-        Box::new(&self.costs)
+    fn get_branch_costs(&self, _: f64) -> &dyn BranchParsimonyCosts {
+        &self.costs
     }
 }
 

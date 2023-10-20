@@ -38,9 +38,9 @@ pub(crate) fn align_two_first_outcome() {
         .collect();
     let (_info, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |l| l - 1,
     );
     assert_eq!(score, 3.5);
@@ -70,9 +70,9 @@ pub(crate) fn align_two_second_outcome() {
         .collect();
     let (_info, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |_| 0,
     );
     assert_eq!(score, 3.5);
@@ -100,7 +100,7 @@ pub(crate) fn align_two_on_tree() {
 
     let scoring = ParsimonyCostsSimple::new(mismatch_cost, gap_open_cost, gap_ext_cost);
 
-    let (alignment_vec, score) = pars_align_on_tree(&Box::new(&scoring), &info);
+    let (alignment_vec, score) = pars_align_on_tree(&scoring, &info);
     assert_eq!(score[Into::<usize>::into(info.tree.root)], 3.5);
     let alignment = &alignment_vec[Into::<usize>::into(info.tree.root)];
     assert_eq!(alignment.map_x.len(), 4);
@@ -126,9 +126,9 @@ pub(crate) fn internal_alignment_first_outcome() {
 
     let (_, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |_| 0,
     );
     assert_eq!(score, 1.0);
@@ -162,9 +162,9 @@ pub(crate) fn internal_alignment_second_outcome() {
 
     let (_info, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |_| 0,
     );
     assert_eq!(score, 2.0);
@@ -191,9 +191,9 @@ pub(crate) fn internal_alignment_third_outcome() {
 
     let (_info, alignment, score) = pars_align_w_rng(
         &leaf_info1,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         &leaf_info2,
-        &scoring.get_branch_costs(1.0),
+        scoring.get_branch_costs(1.0),
         |l| l - 1,
     );
     assert_eq!(score, 2.0);
@@ -225,7 +225,7 @@ pub(crate) fn align_four_on_tree() {
 
     let scoring = ParsimonyCostsSimple::new(c, a, b);
 
-    let (alignment_vec, score) = pars_align_on_tree(&Box::new(&scoring), &info);
+    let (alignment_vec, score) = pars_align_on_tree(&scoring, &info);
     // first cherry
     assert_eq!(score[0], 3.5);
     assert_eq!(alignment_vec[0].map_x.len(), 4);

@@ -84,10 +84,10 @@ impl fmt::Display for ParsimonyAlignmentMatrices {
 fn score_match_one_branch(
     a_set: &ParsimonySet,
     c_set: &ParsimonySet,
-    c_scor: &Box<&dyn BranchCosts>,
+    c_scor: &dyn BranchCosts,
 ) -> f64 {
     a_set
-        .into_iter()
+        .iter()
         .map(|&ancestor| min_score(c_set, c_scor, ancestor))
         .min_by(cmp_f64())
         .unwrap()
@@ -96,19 +96,19 @@ fn score_match_one_branch(
 fn score_match_both_branches(
     a_set: &ParsimonySet,
     x_set: &ParsimonySet,
-    x_scor: &Box<&dyn BranchCosts>,
+    x_scor: &dyn BranchCosts,
     y_set: &ParsimonySet,
-    y_scor: &Box<&dyn BranchCosts>,
+    y_scor: &dyn BranchCosts,
 ) -> f64 {
     a_set
-        .into_iter()
+        .iter()
         .map(|&ancestor| min_score(x_set, x_scor, ancestor) + min_score(y_set, y_scor, ancestor))
         .min_by(cmp_f64())
         .unwrap()
 }
 
-fn min_score(set: &ParsimonySet, scor: &Box<&dyn BranchCosts>, ancestor: u8) -> f64 {
-    set.into_iter()
+fn min_score(set: &ParsimonySet, scor: &dyn BranchCosts, ancestor: u8) -> f64 {
+    set.iter()
         .map(|&child| scor.match_cost(ancestor, child))
         .min_by(cmp_f64())
         .unwrap()
@@ -160,9 +160,9 @@ impl ParsimonyAlignmentMatrices {
     pub(crate) fn fill_matrices(
         &mut self,
         x_info: &[SiteInfo],
-        x_scor: &Box<&dyn BranchCosts>,
+        x_scor: &dyn BranchCosts,
         y_info: &[SiteInfo],
-        y_scor: &Box<&dyn BranchCosts>,
+        y_scor: &dyn BranchCosts,
     ) {
         self.init_x(x_info, x_scor, y_scor);
         self.init_y(y_info, x_scor, y_scor);
@@ -186,12 +186,7 @@ impl ParsimonyAlignmentMatrices {
         }
     }
 
-    fn init_x(
-        &mut self,
-        x_info: &[SiteInfo],
-        x_scor: &Box<&dyn BranchCosts>,
-        y_scor: &Box<&dyn BranchCosts>,
-    ) {
+    fn init_x(&mut self, x_info: &[SiteInfo], x_scor: &dyn BranchCosts, y_scor: &dyn BranchCosts) {
         for i in 1..self.rows {
             self.score.x[i][0] = self.score.x[i - 1][0]
                 + if x_info[i - 1].no_gap() {
@@ -214,12 +209,7 @@ impl ParsimonyAlignmentMatrices {
         }
     }
 
-    fn init_y(
-        &mut self,
-        y_info: &[SiteInfo],
-        x_scor: &Box<&dyn BranchCosts>,
-        y_scor: &Box<&dyn BranchCosts>,
-    ) {
+    fn init_y(&mut self, y_info: &[SiteInfo], x_scor: &dyn BranchCosts, y_scor: &dyn BranchCosts) {
         for j in 1..self.cols {
             self.score.y[0][j] = self.score.y[0][j - 1]
                 + if y_info[j - 1].no_gap() {
@@ -247,9 +237,9 @@ impl ParsimonyAlignmentMatrices {
         i: usize,
         j: usize,
         x_info: &[SiteInfo],
-        x_scor: &Box<&dyn BranchCosts>,
+        x_scor: &dyn BranchCosts,
         y_info: &[SiteInfo],
-        y_scor: &Box<&dyn BranchCosts>,
+        y_scor: &dyn BranchCosts,
     ) -> (f64, Direction) {
         let anc_set = if !(&x_info[i].set & &y_info[j].set).is_empty() {
             &x_info[i].set & &y_info[j].set
@@ -272,9 +262,9 @@ impl ParsimonyAlignmentMatrices {
         i: usize,
         j: usize,
         x_info: &[SiteInfo],
-        x_scor: &Box<&dyn BranchCosts>,
+        x_scor: &dyn BranchCosts,
         y_info: &[SiteInfo],
-        y_scor: &Box<&dyn BranchCosts>,
+        y_scor: &dyn BranchCosts,
     ) -> (f64, f64) {
         if !x_info[i].is_ext() && !y_info[j].is_ext() {
             return (0.0, 0.0);
@@ -308,9 +298,9 @@ impl ParsimonyAlignmentMatrices {
         i: usize,
         j: usize,
         x_info: &[SiteInfo],
-        x_scor: &Box<&dyn BranchCosts>,
+        x_scor: &dyn BranchCosts,
         y_info: &[SiteInfo],
-        y_scor: &Box<&dyn BranchCosts>,
+        y_scor: &dyn BranchCosts,
     ) -> (f64, Direction) {
         let (sm, sx, sy) = match x_info[i].flag {
             GapOpen | GapFixed => (self.score.m[i][j], self.score.x[i][j], self.score.y[i][j]),
@@ -336,7 +326,7 @@ impl ParsimonyAlignmentMatrices {
         i: usize,
         j: usize,
         x_info: &[SiteInfo],
-        x_scor: &Box<&dyn BranchCosts>,
+        x_scor: &dyn BranchCosts,
         y_info: &[SiteInfo],
     ) -> f64 {
         let mut ni = i;
@@ -362,7 +352,7 @@ impl ParsimonyAlignmentMatrices {
         i: usize,
         j: usize,
         x_info: &[SiteInfo],
-        y_scor: &Box<&dyn BranchCosts>,
+        y_scor: &dyn BranchCosts,
     ) -> f64 {
         zip(
             self.trace.x.iter().take(i + 1).skip(1),
@@ -379,9 +369,9 @@ impl ParsimonyAlignmentMatrices {
         i: usize,
         j: usize,
         x_info: &[SiteInfo],
-        x_scor: &Box<&dyn BranchCosts>,
+        x_scor: &dyn BranchCosts,
         y_info: &[SiteInfo],
-        y_scor: &Box<&dyn BranchCosts>,
+        y_scor: &dyn BranchCosts,
     ) -> (f64, Direction) {
         let (sm, sx, sy) = match y_info[j].flag {
             GapFixed | GapOpen => (self.score.m[i][j], self.score.x[i][j], self.score.y[i][j]),
@@ -408,7 +398,7 @@ impl ParsimonyAlignmentMatrices {
         j: usize,
         x_info: &[SiteInfo],
         y_info: &[SiteInfo],
-        y_scor: &Box<&dyn BranchCosts>,
+        y_scor: &dyn BranchCosts,
     ) -> f64 {
         let mut ni = i;
         let mut nj = j;
@@ -433,7 +423,7 @@ impl ParsimonyAlignmentMatrices {
         i: usize,
         j: usize,
         y_info: &[SiteInfo],
-        x_scor: &Box<&dyn BranchCosts>,
+        x_scor: &dyn BranchCosts,
     ) -> f64 {
         zip(
             self.trace.y[i].iter().take(j + 1).skip(1),

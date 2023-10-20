@@ -2,8 +2,8 @@ use self::parsimony_costs::{BranchParsimonyCosts, ParsimonyCosts};
 use self::parsimony_info::ParsimonySiteInfo;
 use self::parsimony_matrices::ParsimonyAlignmentMatrices;
 use self::parsimony_sets::get_parsimony_sets;
-use phylo::alignment::Alignment;
 use log::info;
+use phylo::alignment::Alignment;
 use phylo::phylo_info::PhyloInfo;
 use phylo::sequences::get_sequence_type;
 use phylo::tree::{NodeIdx::Internal as Int, NodeIdx::Leaf};
@@ -27,9 +27,9 @@ fn rng_len(l: usize) -> usize {
 
 fn pars_align_w_rng(
     x_info: &[ParsimonySiteInfo],
-    x_scoring: &Box<&dyn BranchParsimonyCosts>,
+    x_scoring: &dyn BranchParsimonyCosts,
     y_info: &[ParsimonySiteInfo],
-    y_scoring: &Box<&dyn BranchParsimonyCosts>,
+    y_scoring: &dyn BranchParsimonyCosts,
     rng: fn(usize) -> usize,
 ) -> (Vec<ParsimonySiteInfo>, Alignment, f64) {
     let mut pars_mats = ParsimonyAlignmentMatrices::new(x_info.len() + 1, y_info.len() + 1, rng);
@@ -39,15 +39,15 @@ fn pars_align_w_rng(
 
 fn pars_align(
     x_info: &[ParsimonySiteInfo],
-    x_scoring: &Box<&dyn BranchParsimonyCosts>,
+    x_scoring: &dyn BranchParsimonyCosts,
     y_info: &[ParsimonySiteInfo],
-    y_scoring: &Box<&dyn BranchParsimonyCosts>,
+    y_scoring: &dyn BranchParsimonyCosts,
 ) -> (Vec<ParsimonySiteInfo>, Alignment, f64) {
     pars_align_w_rng(x_info, x_scoring, y_info, y_scoring, rng_len)
 }
 
 pub fn pars_align_on_tree(
-    scoring: &Box<&dyn ParsimonyCosts>,
+    scoring: &dyn ParsimonyCosts,
     info: &PhyloInfo,
 ) -> (Vec<Alignment>, Vec<f64>) {
     info!("Starting the IndelMAP alignment.");
@@ -76,10 +76,10 @@ pub fn pars_align_on_tree(
                     Leaf(idx) => (&leaf_info[idx], tree.leaves[idx].blen),
                 };
                 let (info, alignment, score) = pars_align(
-                    &x_info,
-                    &scoring.get_branch_costs(x_branch),
-                    &y_info,
-                    &scoring.get_branch_costs(y_branch),
+                    x_info,
+                    scoring.get_branch_costs(x_branch),
+                    y_info,
+                    scoring.get_branch_costs(y_branch),
                 );
 
                 internal_info[idx] = info;
