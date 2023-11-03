@@ -1,4 +1,5 @@
 use crate::assert_float_relative_slice_eq;
+use crate::parsimony_alignment::parsimony_costs::parsimony_costs_model::GapMultipliers;
 use crate::parsimony_alignment::parsimony_costs::{
     parsimony_costs_model::DNAParsCosts, parsimony_costs_simple::ParsimonyCostsSimple,
     ParsimonyCosts,
@@ -12,6 +13,7 @@ use crate::parsimony_alignment::parsimony_matrices::{
     ParsimonyAlignmentMatrices as PAM,
 };
 use approx::assert_relative_eq;
+use phylo::Rounding;
 use std::f64::INFINITY as INF;
 
 macro_rules! align {
@@ -665,17 +667,13 @@ fn setup_different_branch_lengths() -> (Vec<PSI>, Vec<PSI>, PAM) {
     // Sequence file: sequences_diff_branch_lengths_1.fasta
     // Tree file: tree_diff_branch_lengths_1.newick
 
-    let gap_open_cost = 2.0;
-    let gap_ext_cost = 0.5;
-
     let scoring = DNAParsCosts::new(
         "k80",
         &Vec::new(),
-        gap_open_cost,
-        gap_ext_cost,
+        &GapMultipliers::new(2.0, 0.5),
         &[1.0, 2.0],
         false,
-        false,
+        &Rounding::none(),
     )
     .unwrap();
 
@@ -777,18 +775,13 @@ fn traceback_diff_branch_models() {
 fn setup_different_branch_lengths_2() -> (Vec<PSI>, Vec<PSI>, PAM) {
     // Sequence file: sequences_diff_branch_lengths_2.fasta
     // Tree file: tree_diff_branch_lengths_2.newick
-
-    let gap_open_cost = 1.5;
-    let gap_ext_cost = 0.75;
-
     let scoring = DNAParsCosts::new(
         "k80",
         &Vec::new(),
-        gap_open_cost,
-        gap_ext_cost,
+        &GapMultipliers::new(1.5, 0.75),
         &[3.5, 3.0],
         false,
-        false,
+        &Rounding::none(),
     )
     .unwrap();
     let left_info = vec![
@@ -903,17 +896,13 @@ fn setup_different_branch_lengths_3() -> (Vec<PSI>, Vec<PSI>, PAM) {
     // Sequence file: sequences_diff_branch_lengths_3.fasta
     // Tree file: tree_diff_branch_lengths_3.newick
 
-    let gap_open_cost = 1.0;
-    let gap_ext_cost = 0.75;
-
     let scoring = DNAParsCosts::new(
         "k80",
         &Vec::new(),
-        gap_open_cost,
-        gap_ext_cost,
+        &GapMultipliers::new(1.0, 0.75),
         &[0.52, 2.58],
         false,
-        false,
+        &Rounding::none(),
     )
     .unwrap();
 

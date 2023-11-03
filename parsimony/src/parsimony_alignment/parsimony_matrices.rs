@@ -6,6 +6,8 @@ use super::{
     Direction::{self, GapInX, GapInY, Matc},
 };
 use crate::cmp_f64;
+use crate::parsimony_alignment::parsimony_sets::print_parsimony_set;
+use log::debug;
 use phylo::alignment::{Alignment, Mapping};
 use std::f64::INFINITY as INF;
 use std::{fmt, iter::zip};
@@ -65,18 +67,18 @@ impl fmt::Display for ParsimonyAlignmentMatrices {
         for row in &self.score.y {
             writeln!(f, "{:?}", row).unwrap();
         }
-        writeln!(f, "T.M").unwrap();
-        for row in &self.trace.m {
-            writeln!(f, "{:?}", row).unwrap();
-        }
-        writeln!(f, "T.X").unwrap();
-        for row in &self.trace.x {
-            writeln!(f, "{:?}", row).unwrap();
-        }
-        writeln!(f, "T.Y").unwrap();
-        for row in &self.trace.y {
-            writeln!(f, "{:?}", row).unwrap();
-        }
+        // writeln!(f, "T.M").unwrap();
+        // for row in &self.trace.m {
+        //     writeln!(f, "{:?}", row).unwrap();
+        // }
+        // writeln!(f, "T.X").unwrap();
+        // for row in &self.trace.x {
+        //     writeln!(f, "{:?}", row).unwrap();
+        // }
+        // writeln!(f, "T.Y").unwrap();
+        // for row in &self.trace.y {
+        //     writeln!(f, "{:?}", row).unwrap();
+        // }
         Ok(())
     }
 }
@@ -184,6 +186,7 @@ impl ParsimonyAlignmentMatrices {
                 }
             }
         }
+        debug!("{}", self);
     }
 
     fn init_x(&mut self, x_info: &[SiteInfo], x_scor: &dyn BranchCosts, y_scor: &dyn BranchCosts) {
@@ -248,6 +251,12 @@ impl ParsimonyAlignmentMatrices {
         };
         let match_score =
             score_match_both_branches(&anc_set, &x_info[i].set, x_scor, &y_info[j].set, y_scor);
+        debug!(
+            "Match score for {} and {}: {}",
+            print_parsimony_set(&x_info[i].set),
+            print_parsimony_set(&y_info[j].set),
+            match_score
+        );
         let (x_gap_adj, y_gap_adj) =
             self.score_match_gap_cost_adjustment(i, j, x_info, x_scor, y_info, y_scor);
         self.select_direction(
