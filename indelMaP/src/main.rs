@@ -151,3 +151,6 @@ fn main() -> Result<()> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod real_data_tests;
