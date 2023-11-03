@@ -1,8 +1,15 @@
 use bio::io::fasta;
+use itertools::join;
 use phylo::sequences::{charify, SequenceType, AMINOACIDS_STR, NUCLEOTIDES_STR};
 use std::collections::HashSet;
 
 pub(crate) type ParsimonySet = HashSet<u8>;
+
+pub(crate) fn print_parsimony_set(set: &ParsimonySet) -> String {
+    let mut chars: Vec<char> = set.iter().map(|&a| a as char).collect();
+    chars.sort_by_key(|c| AMINOACIDS_STR.find(*c));
+    join(chars, " ")
+}
 
 pub(crate) fn make_parsimony_set(chars: impl IntoIterator<Item = u8>) -> ParsimonySet {
     ParsimonySet::from_iter(chars)
@@ -79,11 +86,14 @@ pub(crate) fn gap_set() -> ParsimonySet {
 
 #[cfg(test)]
 mod parsimony_sets_tests {
+    use super::{make_parsimony_set, print_parsimony_set};
     use crate::parsimony_alignment::parsimony_sets::{
         gap_set, get_dna_set, get_parsimony_sets, get_protein_set,
     };
     use bio::io::fasta::Record;
-    use phylo::sequences::SequenceType;
+    use itertools::join;
+    use phylo::sequences::{SequenceType, AMINOACIDS_STR};
+    use rstest::rstest;
 
     #[test]
     fn dna_sets() {
@@ -159,6 +169,19 @@ mod parsimony_sets_tests {
         assert_eq!(
             get_protein_set(&b'J'),
             &get_protein_set(&b'I') | &get_protein_set(&b'L')
+        );
+    }
+
+    #[rstest]
+    #[case(vec![b'A', b'C', b'G', b'T'], "ACGT")]
+    #[case(vec![b'T', b'G', b'A', b'C'], "ACGT")]
+    #[case(vec![b'V', b'G'], "GV")]
+    #[case(vec![b'Q', b'I', b'F', b'G', b'W', b'P', b'M', b'N', b'K', b'S', b'E', b'Y', b'T', b'V', b'C', b'R', b'A', b'H', b'L', b'D'], AMINOACIDS_STR)]
+    fn test_parsimony_set_printing(#[case] input: Vec<u8>, #[case] output: &str) {
+        let set = make_parsimony_set(input);
+        assert_eq!(
+            print_parsimony_set(&set),
+            join(output.chars(), " ").as_str()
         );
     }
 }
