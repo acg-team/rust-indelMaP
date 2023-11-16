@@ -1,0 +1,65 @@
+name: rustfmt and clippy with annotations
+
+on:
+  push:
+    branches:    
+      - "**"
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fmt_lib:
+    name: rustfmt on parsimony lib
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.6
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - run: rustup component add rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --manifest-path ./parsimony/Cargo.toml --all -- --check
+
+  clippy_check_lib:
+    name: clippy on parsimony lib
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: rustup component add clippy
+      - uses: actions-rs/clippy-check@v1.0.7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --manifest-path ./parsimony/Cargo.toml --all-features -- -D warnings
+
+  fmt_bin:
+    name: rustfmt on indelMaP bin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.6
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - run: rustup component add rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --manifest-path ./indelMaP/Cargo.toml --all -- --check
+
+  clippy_check_bin:
+    name: clippy on indelMaP bin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: rustup component add clippy
+      - uses: actions-rs/clippy-check@v1.0.7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --manifest-path ./indelMaP/Cargo.toml --all-features -- -D warnings

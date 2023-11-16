@@ -10,7 +10,7 @@ use parsimony::parsimony_alignment::parsimony_costs::parsimony_costs_model::{
 };
 use phylo::alignment::{compile_alignment_representation, Alignment};
 use phylo::io;
-use phylo::phylo_info::{setup_phylogenetic_info, PhyloInfo};
+use phylo::phylo_info::{phyloinfo_from_files, PhyloInfo};
 use phylo::sequences::{get_sequence_type, SequenceType};
 use phylo::tree::{get_percentiles_rounded, NodeIdx};
 use phylo::Rounding;
@@ -98,7 +98,7 @@ fn main() -> Result<()> {
     info!("IndelMaP run started");
     let cli = Cli::try_parse()?;
     info!("Successfully parsed the command line parameters");
-    let info = setup_phylogenetic_info(cli.seq_file, cli.tree_file);
+    let info = phyloinfo_from_files(cli.seq_file, cli.tree_file);
     match info {
         Ok(info) => {
             let (alignment, scores) = match get_sequence_type(&info.sequences) {
