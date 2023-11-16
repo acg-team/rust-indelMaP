@@ -7,7 +7,7 @@ use crate::parsimony_alignment::{
     parsimony_sets::get_parsimony_sets,
 };
 use bio::io::fasta::Record;
-use phylo::phylo_info::PhyloInfo;
+use phylo::phylo_info::phyloinfo_from_sequences_tree;
 use phylo::sequences::SequenceType;
 use phylo::tree::{NodeIdx::Internal as I, NodeIdx::Leaf as L, Tree};
 
@@ -92,11 +92,11 @@ pub(crate) fn align_two_on_tree() {
         Record::with_attrs("A", None, b"AACT"),
         Record::with_attrs("A", None, b"AC"),
     ];
-    let mut tree = Tree::new(&sequences.to_vec());
+    let mut tree = Tree::new(&sequences).unwrap();
     tree.add_parent(0, L(0), L(1), 1.0, 1.0);
     tree.complete = true;
     tree.create_postorder();
-    let info = PhyloInfo::new(tree, sequences.to_vec());
+    let info = phyloinfo_from_sequences_tree(&sequences, tree).unwrap();
 
     let scoring = ParsimonyCostsSimple::new(mismatch_cost, gap_open_cost, gap_ext_cost);
 
@@ -214,14 +214,14 @@ pub(crate) fn align_four_on_tree() {
         Record::with_attrs("D", None, b"GA"),
     ];
 
-    let mut tree = Tree::new(&sequences.to_vec());
+    let mut tree = Tree::new(&sequences).unwrap();
     tree.add_parent(0, L(0), L(1), 1.0, 1.0);
     tree.add_parent(1, L(2), L(3), 1.0, 1.0);
     tree.add_parent(2, I(0), I(1), 1.0, 1.0);
     tree.complete = true;
     tree.create_postorder();
 
-    let info = PhyloInfo::new(tree, sequences.to_vec());
+    let info = phyloinfo_from_sequences_tree(&sequences, tree).unwrap();
 
     let scoring = ParsimonyCostsSimple::new(c, a, b);
 

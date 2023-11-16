@@ -1,12 +1,12 @@
 use crate::indel_map_align_protein_rounded;
 use parsimony::parsimony_alignment::parsimony_costs::parsimony_costs_model::GapMultipliers;
-use phylo::phylo_info::setup_phylogenetic_info;
+use phylo::phylo_info::phyloinfo_from_files;
 use phylo::Rounding;
 use std::path::PathBuf;
 
 #[test]
 fn align_HIV_example_wag() {
-    let info = setup_phylogenetic_info(
+    let info = phyloinfo_from_files(
         PathBuf::from("./data/HIV_subset.fas"),
         PathBuf::from("./data/HIV_subset.nwk"),
     )
