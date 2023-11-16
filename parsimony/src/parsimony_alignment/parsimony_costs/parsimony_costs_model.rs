@@ -1,15 +1,21 @@
-use super::{BranchParsimonyCosts, ParsimonyCosts};
-use crate::{cmp_f64, f64_h, Result};
-use log::{debug, info};
-use nalgebra::{Const, DimMin, SMatrix};
-use ordered_float::OrderedFloat;
-use phylo::substitution_models::{
-    dna_models, protein_models, DNASubstModel, ProteinSubstModel, SubstitutionModel,
-};
-use phylo::Rounding;
 use std::collections::HashMap;
 
-type CostMatrix<const N: usize> = SMatrix<f64, N, N>;
+use log::{debug, info};
+use nalgebra::{Const, DMatrix, DimMin};
+use ordered_float::OrderedFloat;
+
+use phylo::evolutionary_models::EvolutionaryModel;
+use phylo::substitution_models::{
+    dna_models::{nucleotide_index, DNASubstModel},
+    protein_models::{aminoacid_index, ProteinSubstModel},
+    SubstitutionModel,
+};
+use phylo::Rounding;
+
+use crate::parsimony_alignment::{BranchParsimonyCosts, ParsimonyCosts};
+use crate::{cmp_f64, f64_h, Result};
+
+type CostMatrix = DMatrix<f64>;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ParsimonyCostsWModel<const N: usize> {
@@ -52,12 +58,12 @@ impl DNAParsCosts {
             "The scoring matrix entries will {}be rounded to the closest integer value.",
             if rounding.round { "" } else { "not " }
         );
-        let model = DNASubstModel::new(model_name, model_params)?;
+        let model = DNASubstModel::new(model_name, model_params, false)?;
         let costs = generate_costs(
-            model,
+            &model,
             times,
             gap_mult,
-            dna_models::nucleotide_index(),
+            nucleotide_index(),
             zero_diag,
             rounding,
         );
@@ -84,12 +90,12 @@ impl ProteinParsCosts {
             "Setting up the parsimony scoring from the {} substitution model.",
             model_name
         );
-        let model = ProteinSubstModel::new(model_name)?;
+        let model = ProteinSubstModel::new(model_name, &[], false)?;
         let costs = generate_costs(
-            model,
+            &model,
             times,
             gap_mult,
-            protein_models::aminoacid_index(),
+            aminoacid_index(),
             zero_diag,
             rounding,
         );
@@ -106,7 +112,7 @@ impl ProteinParsCosts {
 }
 
 fn generate_costs<const N: usize>(
-    model: SubstitutionModel<N>,
+    model: &SubstitutionModel<N>,
     times: &[f64],
     gap_mult: &GapMultipliers,
     index: [i32; 255],
@@ -180,7 +186,7 @@ pub(crate) struct BranchCostsWModel<const N: usize> {
     avg_cost: f64,
     gap_open: f64,
     gap_ext: f64,
-    costs: CostMatrix<N>,
+    costs: CostMatrix,
 }
 
 impl<const N: usize> BranchParsimonyCosts for BranchCostsWModel<N> {
@@ -214,7 +220,11 @@ mod parsimony_costs_model_test {
             ParsimonyCosts,
         },
     };
-    use phylo::substitution_models::{protein_models, DNASubstModel, ProteinSubstModel};
+    use phylo::evolutionary_models::EvolutionaryModel;
+    use phylo::substitution_models::{
+        dna_models::DNASubstModel,
+        protein_models::{self, ProteinSubstModel},
+    };
     use phylo::Rounding;
 
     #[test]
@@ -226,9 +236,9 @@ mod parsimony_costs_model_test {
         let avg_01 = 5.7675;
         let avg_07 = 4.0075;
         let times = [0.1, 0.7];
-        let model = ProteinSubstModel::new("wag").unwrap();
+        let model = ProteinSubstModel::new("wag", &[], false).unwrap();
         let costs = generate_costs(
-            model,
+            &model,
             &times,
             &gap_mult,
             protein_models::aminoacid_index(),
@@ -244,9 +254,9 @@ mod parsimony_costs_model_test {
         assert_eq!(branch_costs.costs.mean(), avg_07);
         assert_eq!(branch_costs.avg_cost, avg_07);
 
-        let model = ProteinSubstModel::new("wag").unwrap();
+        let model = ProteinSubstModel::new("wag", &[], false).unwrap();
         let costs = generate_costs(
-            model,
+            &model,
             &times,
             &gap_mult,
             protein_models::aminoacid_index(),
@@ -330,9 +340,9 @@ mod parsimony_costs_model_test {
         let avg_01 = 2.25;
         let avg_07 = 1.75;
         let times = [0.1, 0.7];
-        let model = DNASubstModel::new("jc69", &Vec::new()).unwrap();
+        let model = DNASubstModel::new("jc69", &[], false).unwrap();
         let costs = generate_costs(
-            model,
+            &model,
             &times,
             &gap_mult,
             protein_models::aminoacid_index(),
@@ -347,9 +357,9 @@ mod parsimony_costs_model_test {
         let branch_costs = costs.get(&f64_h::from(0.7)).unwrap();
         assert_eq!(branch_costs.costs.mean(), avg_07);
         assert_eq!(branch_costs.avg_cost, avg_07);
-        let model = DNASubstModel::new("jc69", &Vec::new()).unwrap();
+        let model = DNASubstModel::new("jc69", &[], false).unwrap();
         let costs = generate_costs(
-            model,
+            &model,
             &times,
             &gap_mult,
             protein_models::aminoacid_index(),
